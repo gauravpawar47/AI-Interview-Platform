@@ -34,19 +34,23 @@ const AuthForm = ({ type }: { type: FormType }) => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (type === "sign-up") {
-        console.log("Sign up", data);
+        toast.success("Account created successfully. Please sign in.");
+
+        router.push("/sign-in");
       } else {
-        console.log("Sign in", data);
+        toast.success("Sign in successfully.");
+
+        router.push("/");
       }
     } catch (error) {
       console.log(error);
+
       toast.error(`There was an error: ${error}`);
     }
-  };
-
+  }
   const isSignIn = type === "sign-in";
 
   return (

@@ -1,6 +1,7 @@
 "use server";
 
-import { db } from "@/firebase/admin";
+import { auth, db } from "@/firebase/admin";
+import { cookies } from "next/headers";
 
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
@@ -49,4 +50,20 @@ export async function signIn(params: SignInParams) {
       message: "Failed to log into an account.",
     };
   }
+}
+
+export async function setSessionCookie(idToken: string) {
+  const cookieStore = await cookies();
+
+  const sessionCookie = await auth.createSessionCookie(idToken, {
+    expiresIn: ONE_WEEK,
+  });
+
+  cookieStore.set("session", sessionCookie, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: ONE_WEEK,
+  });
 }

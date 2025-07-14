@@ -17,7 +17,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { sign } from "crypto";
+
 import { signIn, signUp } from "@/lib/actions/auth.action";
 
 const authFormSchema = (type: FormType) => {

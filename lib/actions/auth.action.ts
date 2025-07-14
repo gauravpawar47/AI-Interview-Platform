@@ -43,7 +43,16 @@ export async function signIn(params: SignInParams) {
 
   try {
   } catch (e) {
-    console.log(e);
+    const userRecord = await auth.getUserByEmail(email);
+
+    if (!userRecord) {
+      return {
+        success: false,
+        message: "User does not exist. Create an account instead.",
+      };
+    }
+
+    await setSessionCookie(idToken);
 
     return {
       success: false,

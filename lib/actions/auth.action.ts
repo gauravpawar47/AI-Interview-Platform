@@ -2,6 +2,7 @@
 
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
+import { promise } from "zod";
 
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
@@ -80,4 +81,46 @@ export async function setSessionCookie(idToken: string) {
     path: "/",
     maxAge: ONE_WEEK,
   });
+}
+
+// code to check if the user is valid 
+export async function getcurrentUser(): Promise<User | null > { 
+
+  const cookieStore= await cookies();
+
+  const sessionCookie = cookieStore.get('session')?.value;
+
+  if (!sessionCookie) return null ;
+
+  try{
+    const decodedClaims = await auth.verifySessionCookie(sessionCookie,true);
+
+    const userRecord = await db. 
+      collection('users')
+      .doc(decodedClaims.uid)
+      .get();
+
+    if (!userRecord.exists ) return null; 
+
+    return {
+      ...userRecord.data(),
+      id: userRecord.id,
+
+    } as User ;
+
+  }catch(e){
+
+    console.log(e)
+
+    return null;
+  }
+}
+
+// access to user
+export async function isAuthenticated () {
+  const user = await getcurrentUser();
+
+  return !!user; // !!--> turns existance or not existance value to boolean
+
+  
 }
